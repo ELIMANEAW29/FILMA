@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Clapperboard, Film, Plus, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { ArrowLeft, Clapperboard, Film, Plus, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { Link, Route, Routes, useParams } from 'react-router-dom';
 
 const starterFilms = [
   {
     id: 'film-1',
     title: 'Past Lives',
     description: 'Deux amis d’enfance se retrouvent après vingt ans et interrogent les vies qu’ils auraient pu mener.',
+    trailerUrl: 'https://www.youtube.com/embed/kA244xewjcI',
     posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85',
     rating: 4.8,
     category: 'Drame',
@@ -15,6 +17,7 @@ const starterFilms = [
     id: 'film-2',
     title: 'La La Land',
     description: 'À Los Angeles, une actrice et un musicien tentent de faire exister leurs rêves sans se perdre.',
+    trailerUrl: 'https://www.youtube.com/embed/0pdqf4P9MB8',
     posterUrl: 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=85',
     rating: 4.6,
     category: 'Musical',
@@ -24,6 +27,7 @@ const starterFilms = [
     id: 'film-3',
     title: 'Interstellar',
     description: 'Un pilote quitte une Terre à bout de souffle pour chercher un nouvel avenir aux confins du cosmos.',
+    trailerUrl: 'https://www.youtube.com/embed/zSWdZVtXT7E',
     posterUrl: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=900&q=85',
     rating: 4.9,
     category: 'Science-fiction',
@@ -33,6 +37,7 @@ const starterFilms = [
     id: 'film-4',
     title: 'Portrait de la jeune fille en feu',
     description: 'Sur une île bretonne, une peintre et son modèle se découvrent dans le silence et la lumière.',
+    trailerUrl: 'https://www.youtube.com/embed/R-fQPTwma9o',
     posterUrl: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=900&q=85',
     rating: 4.7,
     category: 'Romance',
@@ -42,6 +47,7 @@ const starterFilms = [
     id: 'film-5',
     title: 'The Grand Budapest Hotel',
     description: 'Un concierge légendaire et son jeune protégé traversent une Europe fantasque et mouvementée.',
+    trailerUrl: 'https://www.youtube.com/embed/1Fg5iWmQjwk',
     posterUrl: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=900&q=85',
     rating: 4.4,
     category: 'Comédie',
@@ -51,6 +57,7 @@ const starterFilms = [
     id: 'film-6',
     title: 'Dune : Deuxième partie',
     description: 'Paul Atréides rejoint les Fremen et choisit le destin qui l’attend sur la planète Arrakis.',
+    trailerUrl: 'https://www.youtube.com/embed/Way9Dexny3w',
     posterUrl: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=900&q=85',
     rating: 4.5,
     category: 'Aventure',
@@ -61,7 +68,12 @@ const starterFilms = [
 function readSavedFilms() {
   try {
     const savedFilms = window.localStorage.getItem('filma-films');
-    return savedFilms ? JSON.parse(savedFilms) : starterFilms;
+    if (!savedFilms) return starterFilms;
+
+    return JSON.parse(savedFilms).map((film) => {
+      const starterFilm = starterFilms.find((item) => item.id === film.id);
+      return { ...film, trailerUrl: film.trailerUrl || starterFilm?.trailerUrl || '' };
+    });
   } catch {
     return starterFilms;
   }
@@ -71,7 +83,7 @@ function MovieCard({ film }) {
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
-    <article className="movie-card">
+    <Link className="movie-card" to={`/films/${film.id}`} aria-label={`Voir ${film.title}, sa description et sa bande-annonce`}>
       <div className="poster-frame">
         {!imageFailed ? (
           <img
@@ -102,7 +114,7 @@ function MovieCard({ film }) {
         </div>
         <p>{film.description}</p>
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -151,6 +163,7 @@ function AddFilmDialog({ onClose, onAdd }) {
       id: crypto.randomUUID(),
       title: formData.get('title').trim(),
       description: formData.get('description').trim(),
+      trailerUrl: formData.get('trailerUrl').trim(),
       posterUrl: formData.get('posterUrl').trim(),
       rating: Number(formData.get('rating')),
       category: formData.get('category').trim() || 'Film',
@@ -181,6 +194,10 @@ function AddFilmDialog({ onClose, onAdd }) {
             <textarea name="description" placeholder="Quelques mots sur le film…" required rows="3" maxLength="240" />
           </label>
           <label>
+            URL de la bande-annonce intégrée
+            <input name="trailerUrl" type="url" placeholder="https://www.youtube.com/embed/…" required />
+          </label>
+          <label>
             URL de l’affiche
             <input name="posterUrl" type="url" placeholder="https://…" required />
           </label>
@@ -208,6 +225,57 @@ function AddFilmDialog({ onClose, onAdd }) {
   );
 }
 
+function FilmDetail({ films }) {
+  const { filmId } = useParams();
+  const film = films.find((item) => item.id === filmId);
+
+  if (!film) {
+    return (
+      <section className="detail-not-found">
+        <span className="eyebrow">Collection FILMA</span>
+        <h1>Ce film est introuvable.</h1>
+        <Link className="back-link" to="/">Retour à l’accueil</Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="detail-page">
+      <Link className="back-link" to="/"><ArrowLeft size={15} aria-hidden="true" /> Retour à l’accueil</Link>
+      <div className="detail-overview">
+        <div className="detail-poster">
+          <img src={film.posterUrl} alt={`Affiche de ${film.title}`} />
+        </div>
+        <div className="detail-copy">
+          <span className="eyebrow">{film.category || 'Film'} · {film.year || 'Année inconnue'}</span>
+          <h1>{film.title}</h1>
+          <p>{film.description}</p>
+          <span className="detail-rating"><Star size={16} fill="currentColor" /> {Number(film.rating).toFixed(1)} / 5</span>
+        </div>
+      </div>
+      <div className="trailer-section">
+        <div className="trailer-heading">
+          <span className="section-index">À VOIR</span>
+          <h2>La bande-annonce</h2>
+        </div>
+        {film.trailerUrl ? (
+          <div className="trailer-frame">
+            <iframe
+              src={film.trailerUrl}
+              title={`Bande-annonce de ${film.title}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <p className="trailer-unavailable">Aucune bande-annonce n’est renseignée pour ce film.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [films, setFilms] = useState(readSavedFilms);
   const [search, setSearch] = useState('');
@@ -230,7 +298,7 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <a className="wordmark" href="#accueil" aria-label="FILMA, accueil"><span className="brand-mark"><Film size={18} /></span>filma<span className="wordmark-period">.</span></a>
+        <Link className="wordmark" to="/" aria-label="FILMA, accueil"><span className="brand-mark"><Film size={18} /></span>filma<span className="wordmark-period">.</span></Link>
         <div className="topbar-right">
           <span className="collection-label"><span className="status-dot" /> MA COLLECTION</span>
           <button className="primary-button top-add" onClick={() => setIsDialogOpen(true)}>
@@ -239,6 +307,9 @@ export default function App() {
         </div>
       </header>
 
+      <Routes>
+        <Route path="/" element={(
+          <>
       <section className="intro" id="accueil">
         <div className="intro-copy">
           <span className="eyebrow">Le cinéma, à votre façon</span>
@@ -272,6 +343,11 @@ export default function App() {
 
         <MovieList films={visibleFilms} />
       </section>
+          </>
+        )} />
+        <Route path="/films/:filmId" element={<FilmDetail films={films} />} />
+        <Route path="*" element={<FilmDetail films={[]} />} />
+      </Routes>
 
       <footer className="footer"><span>FILMA <span className="wordmark-period">.</span></span><span>FAIT POUR LES BELLES HISTOIRES</span><span>© 2025</span></footer>
       {isDialogOpen && <AddFilmDialog onClose={() => setIsDialogOpen(false)} onAdd={addFilm} />}

@@ -65,7 +65,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .rating-control select { min-width: 65px; padding: 8px 0; border: 0; color: var(--ink); background: transparent; font-size: 11px; cursor: pointer; }
 .result-count { padding-left: 15px; border-left: 1px solid var(--line); color: #92968d; font-size: 10px; white-space: nowrap; }
 .movie-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 22px; }
-.movie-card { min-width: 0; animation: rise-in .45s both; }
+.movie-card { display: block; min-width: 0; color: inherit; text-decoration: none; animation: rise-in .45s both; }
 .movie-card:nth-child(2) { animation-delay: .06s; }
 .movie-card:nth-child(3) { animation-delay: .12s; }
 .poster-frame { position: relative; aspect-ratio: 1.42 / 1; overflow: hidden; background: #e2e3da; }
@@ -98,6 +98,27 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
 .dialog-actions { display: flex; justify-content: flex-end; align-items: center; gap: 17px; margin-top: 6px; }
 .text-button { padding: 9px; border: 0; color: #757a72; background: transparent; font-size: 12px; cursor: pointer; }
+.detail-page { padding: 29px 0 62px; }
+.back-link { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 27px; color: var(--green); font-size: 12px; font-weight: 600; text-decoration: none; }
+.back-link:hover { color: var(--accent); }
+.detail-overview { display: grid; grid-template-columns: minmax(210px, .72fr) minmax(0, 1.28fr); align-items: center; gap: 48px; }
+.detail-poster { max-width: 390px; aspect-ratio: 4 / 5; overflow: hidden; background: #e2e3da; }
+.detail-poster img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.detail-copy { max-width: 620px; }
+.detail-copy .eyebrow { margin-bottom: 12px; }
+.detail-copy h1, .detail-not-found h1 { margin: 0; font: 500 42px/1.12 var(--serif); }
+.detail-copy p { margin: 17px 0; color: #777d75; font-size: 14px; line-height: 1.8; }
+.detail-rating { display: inline-flex; align-items: center; gap: 7px; color: #c48536; font-size: 12px; font-weight: 700; }
+.trailer-section { margin-top: 42px; padding-top: 27px; border-top: 1px solid var(--line); }
+.trailer-heading { margin-bottom: 15px; }
+.trailer-heading .section-index { margin-bottom: 6px; }
+.trailer-heading h2 { margin: 0; font: 500 27px/1.2 var(--serif); }
+.trailer-frame { width: min(100%, 960px); aspect-ratio: 16 / 9; background: #202720; }
+.trailer-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.trailer-unavailable { width: min(100%, 960px); margin: 0; padding: 28px; color: var(--muted); background: #eae9e1; font-size: 13px; }
+.detail-not-found { min-height: 52vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.detail-not-found .eyebrow { margin-bottom: 10px; }
+.detail-not-found .back-link { margin: 18px 0 0; }
 @keyframes rise-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
@@ -105,6 +126,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .app-shell { padding: 0 5%; }
   .intro-art { margin-right: 2%; transform: scale(.85); transform-origin: center right; }
   .movie-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 29px 18px; }
+  .detail-overview { grid-template-columns: minmax(180px, .7fr) minmax(0, 1.3fr); gap: 28px; }
+  .detail-copy h1 { font-size: 35px; }
 }
 @media (max-width: 560px) {
   .app-shell { padding: 0 20px; }
@@ -136,6 +159,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .rating { gap: 2px; font-size: 10px; }
   .rating svg { width: 12px; }
   .movie-info p { font-size: 10px; }
+  .detail-page { padding-top: 23px; }
+  .detail-overview { grid-template-columns: 1fr; gap: 23px; }
+  .detail-poster { width: min(100%, 330px); aspect-ratio: 1.42 / 1; }
+  .detail-copy h1 { font-size: 32px; }
+  .detail-copy p { font-size: 13px; }
+  .trailer-section { margin-top: 32px; }
+  .trailer-heading h2 { font-size: 24px; }
   .footer { font-size: 8px; }
   .add-dialog { padding: 23px 20px 20px; }
 }
